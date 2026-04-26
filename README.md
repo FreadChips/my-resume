@@ -64,3 +64,6 @@ my-resume/
 ## 浏览器兼容
 
 支持现代浏览器（Chrome、Firefox、Safari、Edge）的打印功能。
+
+## 实例页面
+![alt text](example1-1.png)
