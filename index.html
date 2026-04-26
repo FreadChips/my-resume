@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>简历助手</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="topbar-title">简历助手</h1>
+        <span class="topbar-badge">实时预览</span>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-primary" onclick="exportPDF()" title="导出 PDF">导出 PDF</button>
+        <button class="btn btn-outline" onclick="exportHTML()" title="生成独立 HTML 文件">导出 HTML</button>
+        <button class="btn btn-ghost" onclick="loadSampleData()">示例数据</button>
+        <button class="btn btn-ghost btn-danger" onclick="clearData()">清除</button>
+      </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="app-body">
+      <!-- ===== Editor Panel ===== -->
+      <aside class="editor" id="editor">
+
+        <!-- Section: Basic Info -->
+        <div class="editor-section">
+          <div class="editor-section-header" onclick="toggleSection(this)">
+            <span>基本信息</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="editor-section-body">
+            <div class="form-group">
+              <label>姓名</label>
+              <input type="text" id="input-name" data-bind="basics.name" placeholder="张三" oninput="onFormChange()">
+            </div>
+            <div class="form-group">
+              <label>职位</label>
+              <input type="text" id="input-title" data-bind="basics.title" placeholder="前端开发工程师" oninput="onFormChange()">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>邮箱</label>
+                <input type="email" id="input-email" data-bind="basics.email" placeholder="zhangsan@email.com" oninput="onFormChange()">
+              </div>
+              <div class="form-group">
+                <label>电话</label>
+                <input type="text" id="input-phone" data-bind="basics.phone" placeholder="138-0000-0000" oninput="onFormChange()">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>地点</label>
+                <input type="text" id="input-location" data-bind="basics.location" placeholder="北京市" oninput="onFormChange()">
+              </div>
+              <div class="form-group">
+                <label>个人网站</label>
+                <input type="text" id="input-website" data-bind="basics.website" placeholder="https://example.com" oninput="onFormChange()">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>头像上传（最大 2MB）</label>
+              <div class="avatar-upload">
+                <div class="avatar-preview" id="avatar-preview">
+                  <span class="avatar-placeholder">📷</span>
+                </div>
+                <input type="file" id="input-avatar" accept="image/*" onchange="handleAvatarUpload(event)">
+                <button class="btn btn-small btn-outline" type="button" onclick="document.getElementById('input-avatar').click()">选择图片</button>
+                <button class="btn btn-small btn-ghost" type="button" onclick="removeAvatar()" style="margin-left:4px">清除</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Profile -->
+        <div class="editor-section">
+          <div class="editor-section-header" onclick="toggleSection(this)">
+            <span>个人简介</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="editor-section-body">
+            <div class="form-group">
+              <textarea id="input-profile" data-bind="profile" rows="4" placeholder="请简要描述您的职业背景、核心优势和个人特点…" oninput="onFormChange()"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Work Experience -->
+        <div class="editor-section">
+          <div class="editor-section-header" onclick="toggleSection(this)">
+            <span>工作经历</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="editor-section-body">
+            <div id="work-list"></div>
+            <button class="btn btn-small btn-outline add-btn" onclick="addWorkItem()">+ 添加工作经历</button>
+          </div>
+        </div>
+
+        <!-- Section: Education -->
+        <div class="editor-section">
+          <div class="editor-section-header" onclick="toggleSection(this)">
+            <span>教育背景</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="editor-section-body">
+            <div id="education-list"></div>
+            <button class="btn btn-small btn-outline add-btn" onclick="addEducationItem()">+ 添加教育经历</button>
+          </div>
+        </div>
+
+        <!-- Section: Projects -->
+        <div class="editor-section">
+          <div class="editor-section-header" onclick="toggleSection(this)">
+            <span>项目经历</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="editor-section-body">
+            <div id="project-list"></div>
+            <button class="btn btn-small btn-outline add-btn" onclick="addProjectItem()">+ 添加项目经历</button>
+          </div>
+        </div>
+
+        <!-- Section: Skills -->
+        <div class="editor-section">
+          <div class="editor-section-header" onclick="toggleSection(this)">
+            <span>技能</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="editor-section-body">
+            <div class="form-group">
+              <label>每行一个技能类别，格式：<code>类别: 技能1, 技能2</code></label>
+              <textarea id="input-skills" data-bind="skills" rows="5" placeholder="前端: HTML, CSS, JavaScript, React&#10;后端: Node.js, Python, Go&#10;工具: Git, Docker, Webpack" oninput="onFormChange()"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Languages -->
+        <div class="editor-section">
+          <div class="editor-section-header" onclick="toggleSection(this)">
+            <span>语言能力</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="editor-section-body">
+            <div class="form-group">
+              <label>每行一种语言</label>
+              <textarea id="input-languages" data-bind="languages" rows="4" placeholder="中文（母语）&#10;英语（流利，CET-6）&#10;日语（日常会话）" oninput="onFormChange()"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Certificates -->
+        <div class="editor-section">
+          <div class="editor-section-header" onclick="toggleSection(this)">
+            <span>证书</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="editor-section-body">
+            <div class="form-group">
+              <label>每行一个证书</label>
+              <textarea id="input-certificates" data-bind="certificates" rows="4" placeholder="PMP 项目管理专业人士&#10;阿里云 ACE 认证&#10;雅思 7.5" oninput="onFormChange()"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Style Settings -->
+        <div class="editor-section">
+          <div class="editor-section-header" onclick="toggleSection(this)">
+            <span>样式设置</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="editor-section-body">
+            <div class="form-group">
+              <label>布局风格</label>
+              <div class="theme-selector" id="layout-selector">
+                <label class="theme-option" data-value="classic" onclick="changeLayout('classic')">
+                  <span class="theme-preview lp-classic"></span>
+                  <span>经典</span>
+                </label>
+                <label class="theme-option" data-value="modern" onclick="changeLayout('modern')">
+                  <span class="theme-preview lp-modern"></span>
+                  <span>现代</span>
+                </label>
+                <label class="theme-option" data-value="creative" onclick="changeLayout('creative')">
+                  <span class="theme-preview lp-creative"></span>
+                  <span>创新</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>颜色主题</label>
+              <div class="theme-selector" id="theme-selector">
+                <label class="theme-option" data-value="blue" onclick="changeTheme('blue')">
+                  <span class="color-swatch swatch-blue"></span>
+                  <span>蓝色</span>
+                </label>
+                <label class="theme-option" data-value="green" onclick="changeTheme('green')">
+                  <span class="color-swatch swatch-green"></span>
+                  <span>绿色</span>
+                </label>
+                <label class="theme-option" data-value="purple" onclick="changeTheme('purple')">
+                  <span class="color-swatch swatch-purple"></span>
+                  <span>紫色</span>
+                </label>
+                <label class="theme-option" data-value="orange" onclick="changeTheme('orange')">
+                  <span class="color-swatch swatch-orange"></span>
+                  <span>橙色</span>
+                </label>
+                <label class="theme-option" data-value="dark" onclick="changeTheme('dark')">
+                  <span class="color-swatch swatch-dark"></span>
+                  <span>深色</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>模块显示控制</label>
+              <div class="visibility-grid" id="visibility-controls">
+                <label class="vis-toggle"><input type="checkbox" data-module="profile" checked onchange="toggleModule(this)"><span>个人简介</span></label>
+                <label class="vis-toggle"><input type="checkbox" data-module="work" checked onchange="toggleModule(this)"><span>工作经历</span></label>
+                <label class="vis-toggle"><input type="checkbox" data-module="education" checked onchange="toggleModule(this)"><span>教育背景</span></label>
+                <label class="vis-toggle"><input type="checkbox" data-module="projects" checked onchange="toggleModule(this)"><span>项目经历</span></label>
+                <label class="vis-toggle"><input type="checkbox" data-module="skills" checked onchange="toggleModule(this)"><span>技能</span></label>
+                <label class="vis-toggle"><input type="checkbox" data-module="languages" checked onchange="toggleModule(this)"><span>语言能力</span></label>
+                <label class="vis-toggle"><input type="checkbox" data-module="certificates" checked onchange="toggleModule(this)"><span>证书</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- ===== Preview Panel ===== -->
+      <main class="preview" id="preview-panel">
+        <div class="preview-toolbar">
+          <span class="preview-label">简历预览</span>
+          <button class="btn btn-small btn-ghost" onclick="refreshPreview()" title="刷新预览">⟳</button>
+        </div>
+        <div class="preview-container" id="preview-container">
+          <div id="resume-preview" class="resume-preview theme-blue layout-classic"></div>
+          <div class="preview-empty" id="preview-empty">
+            <div class="empty-icon">📄</div>
+            <p>在左侧编辑信息即可开始制作简历</p>
+            <button class="btn btn-outline" onclick="loadSampleData()">加载示例数据</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
