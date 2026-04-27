@@ -33,10 +33,10 @@
 - **清除数据** — 清除所有本地保存的内容
 
 ## 快速开始
-###在线
+### 在线
 https://freadchips.github.io/my-resume/
 
-###本地
+### 本地
 直接在浏览器中打开 `index.html` 即可使用
 
 ```bash
